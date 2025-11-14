@@ -12,8 +12,13 @@
 #endif
 
 int PFerrno = PFE_OK;	/* last error message */
-
+int bufferPolicy = 0; /* buffer replacement policy: 0 for LRU, 1 for MRU */
 static PFftab_ele PFftab[PF_FTAB_SIZE]; /* table of opened files */
+/****************** Statistics Counter *****************************/
+int logical_reads = 0;
+int physical_reads = 0;
+int physical_writes = 0;
+/*****************************************************************************/
 
 /* true if file descriptor fd is invaild */
 #define PFinvalidFd(fd) ((fd) < 0 || (fd) >= PF_FTAB_SIZE \
@@ -185,11 +190,27 @@ GLOBAL VARIABLES MODIFIED:
 int i;
 	/* init the hash table */
 	PFhashInit();
-
 	/* init the file table to be not used*/
 	for (i=0; i < PF_FTAB_SIZE; i++){
 		PFftab[i].fname = NULL;
 	}
+}
+
+void PF_InitStats() {
+    logical_reads = 0;
+    physical_reads = 0;
+    physical_writes = 0;
+}
+
+void PF_PrintStats() {
+    printf("PF Layer Statistics:\n");
+    printf("  Logical Reads:   %d\n", logical_reads);
+    printf("  Physical Reads:  %d\n", physical_reads);
+    printf("  Physical Writes: %d\n", physical_writes);
+    if (logical_reads > 0) {
+        float hit_rate = ((float)(logical_reads - physical_reads) / logical_reads) * 100.0;
+        printf("  Buffer Hit Rate: %.2f%%\n", hit_rate);
+    }
 }
 
 PF_CreateFile(fname)
@@ -273,8 +294,9 @@ int error;
 }
 
 
-PF_OpenFile(fname)
+PF_OpenFile(fname, policy)
 char *fname;		/* name of the file to open */
+int policy; /* buffer replacement policy */
 /****************************************************************************
 SPECIFICATIONS:
 	Open the paged file whose name is fname.  It is possible to open
@@ -297,7 +319,7 @@ IMPLEMENTATION NOTES:
 {
 int count;	/* # of bytes in read */
 int fd; /* file descriptor */
-
+bufferPolicy = policy;
 	/* find a free entry in the file table */
 	if ((fd=PFftabFindFree())< 0){
 		/* file table full */
@@ -333,7 +355,7 @@ int fd; /* file descriptor */
 		PFerrno = PFE_NOMEM;
 		return(PFerrno);
 	}
-
+	
 	return(fd);
 }
 
@@ -686,7 +708,6 @@ RETURN VALUE:
 
 *****************************************************************************/
 {
-
 	if (PFinvalidFd(fd)){
 		PFerrno = PFE_FD;
 		return(PFerrno);

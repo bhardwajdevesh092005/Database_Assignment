@@ -65,9 +65,12 @@ typedef struct PFhash_entry {
 
 /* Hash function for hash table */
 #define PFhash(fd,page) (((fd)+(page)) % PF_HASH_TBL_SIZE)
-
 /******************* Interface functions from Hash Table ****************/
 extern void PFhashInit();
+extern int bufferPolicy;
+extern int logical_reads;
+extern int physical_reads;
+extern int physical_writes;
 extern PFbpage *PFhashFind();
 extern PFhashInsert();
 extern PFhashDelete();

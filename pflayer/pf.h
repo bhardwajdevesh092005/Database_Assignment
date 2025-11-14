@@ -33,8 +33,9 @@
 
 /* page size */
 #define PF_PAGE_SIZE	4096
-
 /* externs from the PF layer */
 extern int PFerrno;		/* error number of last error */
 extern void PF_Init();
+extern void PF_InitStats();
+extern void PF_PrintStats();
 extern void PF_PrintError();

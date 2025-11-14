@@ -10,7 +10,7 @@ static PFbpage *PFfirstbpage= NULL;	/* ptr to first buffer page, or NULL */
 static PFbpage *PFlastbpage = NULL;	/* ptr to last buffer page, or NULL */
 static PFbpage *PFfreebpage= NULL;	/* list of free buffer pages */
 
-extern char *malloc();
+extern void* malloc();
 
 static void PFbufInsertFree(bpage)
 PFbpage *bpage;
@@ -149,8 +149,7 @@ int error;		/* error value returned*/
 		/* choose a victim from the buffer*/
 
 		*bpage = NULL;		/* set initial return value */
-
-		for (tbpage=PFlastbpage;tbpage!=NULL;tbpage=tbpage->prevpage){
+		for (tbpage=(bufferPolicy == 0 ? PFlastbpage : PFfirstbpage);tbpage!=NULL;tbpage=(bufferPolicy == 0 ? tbpage->prevpage : tbpage->nextpage)){
 			if (!tbpage->fixed)
 				/* found a page that can be swapped out */
 				break;
@@ -166,6 +165,9 @@ int error;		/* error value returned*/
 		if (tbpage->dirty&&((error=(*writefcn)(tbpage->fd,
 				tbpage->page,&tbpage->fpage))!= PFE_OK))
 			return(error);
+		if(tbpage->dirty){
+			physical_writes++;
+		}
 		tbpage->dirty = FALSE;
 
 		/* unlink from hash table */
@@ -222,7 +224,9 @@ GLOBAL VARIABLES MODIFIED:
 {
 PFbpage *bpage;	/* pointer to buffer */
 int error;
-
+extern int logical_reads;
+	logical_reads++;
+	/* see if this page is already in the buffer */
 	if ((bpage=PFhashFind(fd,pagenum)) == NULL){
 		/* page not in buffer. */
 		
@@ -251,11 +255,12 @@ int error;
 			PFbufInsertFree(bpage);
 			return(error);
 		}
-
 		/* set the fields for this page*/
 		bpage->fd = fd;
 		bpage->page = pagenum;
 		bpage->dirty = FALSE;
+		extern int physical_reads;
+		physical_reads++;
 	}
 	else if (bpage->fixed){
 		/* page already in memory, and is fixed, so we can't
