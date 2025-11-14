@@ -534,7 +534,6 @@ RETURN VALUE:
 {
 int error;
 PFfpage *fpage;
-
 	if (PFinvalidFd(fd)){
 		PFerrno = PFE_FD;
 		return(PFerrno);

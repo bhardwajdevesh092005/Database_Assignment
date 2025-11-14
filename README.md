@@ -39,8 +39,8 @@ A framework for collecting performance statistics has been successfully integrat
 
 -   **Counters:** Global static counters for `logical_reads`, `physical_reads`, and `physical_writes` have been added to `pf.c`.
 -   **Instrumentation:**
-    -   A **logical read** is correctly counted every time `PF_GetPage` is called, representing a request for a page.
-    -   A **physical read** is counted within `PF_GetPage` only when the requested page is not found in the buffer, forcing a read from disk.
+    -   A **logical read** is correctly counted every time `PF_GetThisPage` is called, representing a request for a page.
+    -   A **physical read** is counted within `PF_GetThisPage` only when the requested page is not found in the buffer, forcing a read from disk.
     -   A **physical write** is counted in `PFbufInternalAlloc` when a dirty page is written to disk during eviction.
 -   **Reporting:** `PF_InitStats()` and `PF_PrintStats()` functions have been created to manage and display the collected statistics, including a calculated buffer hit rate.
 
