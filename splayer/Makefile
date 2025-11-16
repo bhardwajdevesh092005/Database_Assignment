@@ -14,16 +14,22 @@ OBJS = sp.o
 PF_OBJS = ../pflayer/pf.o ../pflayer/buf.o ../pflayer/hash.o
 
 # Default target builds the test program
-all: test_sp test_stats
+TARGETS = test_sp test_stats test_linear_scan
+
+all: $(TARGETS)
 
 # Rule to build the test executable
 # It depends on the test object file, the SP layer objects, and the PF layer objects.
-test_sp: test_sp.o $(OBJS) $(PF_OBJS)
-	$(CC) $(CFLAGS) -o test_sp test_sp.o $(OBJS) $(PF_OBJS)
+test_sp: test_sp.o sp.o
+	$(CC) $(CFLAGS) -o test_sp test_sp.o sp.o ../pflayer/pf.o ../pflayer/buf.o ../pflayer/hash.o -lm
 
 # Rule to build the stats test executable
-test_stats: test_stats.o $(OBJS) $(PF_OBJS)
-	$(CC) $(CFLAGS) -o test_stats test_stats.o $(OBJS) $(PF_OBJS) -lm
+test_stats: test_stats.o sp.o
+	$(CC) $(CFLAGS) -o test_stats test_stats.o sp.o ../pflayer/pf.o ../pflayer/buf.o ../pflayer/hash.o -lm
+
+# Rule to build the linear scan test executable
+test_linear_scan: test_linear_scan.o sp.o
+	$(CC) $(CFLAGS) -o test_linear_scan test_linear_scan.o sp.o ../pflayer/pf.o ../pflayer/buf.o ../pflayer/hash.o -lm
 
 # Rule to compile the SP layer source file
 sp.o: sp.c sp.h sptype.h
@@ -34,10 +40,15 @@ test_sp.o: test_sp.c sp.h sptype.h
 	$(CC) $(CFLAGS) -c test_sp.c
 
 # Rule to compile the stats test driver
-test_stats.o: test_stats.c sp.h sptype.h
+test_stats.o: test_stats.c sp.h ../pflayer/pf.h
 	$(CC) $(CFLAGS) -c test_stats.c
+
+# Rule to compile the linear scan test driver
+test_linear_scan.o: test_linear_scan.c sp.h ../pflayer/pf.h
+	$(CC) $(CFLAGS) -c test_linear_scan.c
+
 # Clean up generated files
 clean:
-	rm -f test_sp test_stats *.o *~
+	rm -f test_sp test_stats test_linear_scan *.o *~
 
 .PHONY: all clean

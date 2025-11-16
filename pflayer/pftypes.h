@@ -19,7 +19,7 @@ typedef struct PFfpage {
 	int nextfree;	/* page number of next free page in the linked
 			list of free pages, or PF_PAGE_LIST_END if
 			end of list, or PF_PAGE_USED if this page is not free */
-	char pagebuf[PF_PAGE_SIZE];	/* actual page data */
+	char pagebuf[4096];	/* actual page data */
 } PFfpage;
 
 /*************************** Opened File Table **********************/
