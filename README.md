@@ -1,4 +1,4 @@
-# Project Final Report — PF Layer Buffering & SP / AM Layers  
+# Project Final Report 
 **Course:** CSL3050-Database Systems  
 **Instructor:** Nitin Awathare  
 **Team:** Devesh Bharwaj (B23CS1014) && Diwanshu Yadav (B23CS1017)  
@@ -313,11 +313,10 @@ This project is built using `make`.
     ```
 
 4.  **Run the executables:**
-    The `README.md` in the repository mentions a `test_lru_mru` executable. You can run it (and other executables like `test_indexing` which may be built) as follows:
+    You can run executables like `test_indexing` which will be built as follows:
     ```bash
-    ./test_lru_mru
+    ./test_indexing
     ```
-    *(You may also want to run other executables that are created by the `make` command, such as `./test_indexing`)*
 
 5.  **Clean up build files (Optional):**
     To remove the compiled object files and executables:
