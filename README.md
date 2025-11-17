@@ -292,34 +292,97 @@ Below are two visualization scripts (self-contained). Run them in Python 3 with 
 - ...  
 
 ---
+***
+
 ## How to Run
 
-This project is built using `make`.
+This project is built using `make`. The build process requires compiling several dependency layers in a specific order before building the final executable.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/bhardwajdevesh092005/Database_Assignment.git](https://github.com/bhardwajdevesh092005/Database_Assignment.git)
-    ```
+### Prerequisites
 
-2.  **Navigate to the directory:**
-    ```bash
-    cd Database_Assignment
-    ```
+- `git`
+- `make`
+- A C/C++ compiler toolchain (e.g., GCC/g++)
 
-3.  **Compile the project:**
-    Run the `make` command to build the executables.
+### 1. Clone the Repository
+
+First, clone the project repository to your local machine.
+
+```bash
+git clone https://github.com/bhardwajdevesh092005/Database_Assignment.git
+cd Database_Assignment
+```
+
+### 2. Compile Dependencies
+
+You must compile each layer sequentially to create the necessary object files (`.o`).
+
+-   **Compile `pflayer`:**
     ```bash
+    cd pflayer
     make
+    cd ..
+    ```
+-   **Compile `splayer`:**
+    ```bash
+    cd splayer
+    make
+    cd ..
+    ```
+-   **Compile `bulklayer`:**
+    ```bash
+    cd bulklayer
+    make
+    cd ..
     ```
 
-4.  **Run the executables:**
-    You can run executables like `test_indexing` which will be built as follows:
-    ```bash
-    ./test_indexing
-    ```
+### 3. Compile the Main Application
 
-5.  **Clean up build files (Optional):**
-    To remove the compiled object files and executables:
-    ```bash
-    make clean
-    ```
+Once all dependencies are built, run `make` from the root directory to build the `amlayer` and the final `test_indexing` executable.
+
+```bash
+make
+```
+
+### 4. Run the Main Application
+
+You can now execute the main performance test.
+
+```bash
+./test_indexing
+```
+
+---
+
+## Optional: Running Individual Layer Tests
+
+After compiling a specific layer (as shown in Step 2), you can run its standalone tests to verify its functionality.
+
+#### Slotted Page Layer (`splayer`) Tests
+
+```bash
+cd splayer
+./test_sp
+./test_stats
+./test_linear_scan
+cd ..
+```
+
+#### Bulk-Load Layer (`bulklayer`) Test
+
+```bash
+cd bulklayer
+./testbl
+cd ..
+```
+
+## Clean Up
+
+To remove all compiled object files and executables from all directories, run the following command from the project's root directory.
+
+```bash
+make clean
+(cd pflayer && make clean)
+(cd splayer && make clean)
+(cd bulklayer && make clean)
+```
